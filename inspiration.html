@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topographic Map</title>
+  <style>
+    body, html {
+      width: 100%;
+      height: 100%;
+      margin: auto;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #111010;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .centerbox {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 20%;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin: 0 0 20px 0;
+      font-size: 4em;
+      text-align: center;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .title img {
+      width: 0.85em;
+      height: 1.25em;
+      vertical-align: middle;
+    }
+
+    canvas {
+      box-shadow: 0 0 10px #060606;
+      border: 1px solid #333;
+      background-color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class='centerbox'>
+    <h1 class="title">WHERE IS THE S<a href="index.html"><img src="portal-0.png" alt="O"></a>IL?</h1>
+    <h2>The inspiration for this project is an easter egg from Portal 2! (spoilers)</h2>
+    <p>Chell on bring your kids to work day, visits Aperture Science, where she and other children
+        build Potato batteries, hoping that will become the future of energy. However, many, many years
+        later, when the events of Portal 2 take place, as a little easter egg, you come across these projects,
+        one of which was created by Chell, however, it has had an extremely odd growth, and has become a monstrous
+        potato. This is the inspiration for this project, as the theme "Growth" fits with the growing of the potato.
+    
+        Also inspired by the nature of the resilience of Potatos and the fact that the sprouts 
+        seem to violently grow, in search for soil.
+
+
+    </p>
+
+    </p>
+  </div>
+  <script src='perlin.js'></script>
+  <script src="script.js"></script>
+</body>
+</html>
