@@ -140,56 +140,92 @@ function updateRoots() {
     ];
 
     const newRoots = [];
+    const enableBacktracking = document.getElementById('backtracking').checked;
+
+    // Helper function to create a unique key for a point
+    function pointToKey(point) {
+        return `${point.x},${point.y}`;
+    }
 
     roots.forEach(root => {
+        // Initialize a set of visited points for each root if not already present
+        if (!root.visited) {
+            root.visited = new Set();
+            root.path.forEach(point => root.visited.add(pointToKey(point)));
+        }
+
         if (!root.foundSoil) {
             const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+            const lastPoint = root.path[root.path.length - 1];
             const newPoint = {
-                x: root.path[root.path.length - 1].x + randomDirection.x,
-                y: root.path[root.path.length - 1].y + randomDirection.y
+                x: lastPoint.x + randomDirection.x,
+                y: lastPoint.y + randomDirection.y
             };
 
-            // Check if the new point is within the canvas boundaries
-            if (newPoint.x >= 0 && newPoint.x < canvas.width && newPoint.y >= 0 && newPoint.y < canvas.height) {
+            // Check if the new point is within the canvas boundaries and not revisited
+            const pointKey = pointToKey(newPoint);
+            if (
+                newPoint.x >= 0 && newPoint.x < canvas.width &&
+                newPoint.y >= 0 && newPoint.y < canvas.height &&
+                (!root.visited.has(pointKey) || enableBacktracking)
+            ) {
                 const moistureIndex = Math.floor(newPoint.x) + Math.floor(newPoint.y) * canvas.width;
                 const moistureLevel = moistureData[moistureIndex];
                 console.log("Moisture Level: ", moistureLevel);
+
                 // Check if the moisture level is above a certain threshold
                 if (moistureLevel > 0.3) { // Adjust the threshold as needed
                     root.foundSoil = true;
                 } else {
                     root.path.push(newPoint);
+                    root.visited.add(pointKey);
                 }
             }
         } else {
-            // Move towards the direction with the highest moisture value
+            // Move towards the direction with the highest moisture value, avoiding revisited points when possible
+            const lastPoint = root.path[root.path.length - 1];
             let bestDirection = null;
             let highestMoisture = -1;
+            let fallbackDirection = null;
 
             directions.forEach(direction => {
                 const newPoint = {
-                    x: root.path[root.path.length - 1].x + direction.x,
-                    y: root.path[root.path.length - 1].y + direction.y
+                    x: lastPoint.x + direction.x,
+                    y: lastPoint.y + direction.y
                 };
 
-                // Check if the new point is within the canvas boundaries
-                if (newPoint.x >= 0 && newPoint.x < canvas.width && newPoint.y >= 0 && newPoint.y < canvas.height) {
+                // Check if the new point is within canvas boundaries
+                const pointKey = pointToKey(newPoint);
+                if (
+                    newPoint.x >= 0 && newPoint.x < canvas.width &&
+                    newPoint.y >= 0 && newPoint.y < canvas.height
+                ) {
                     const moistureIndex = Math.floor(newPoint.x) + Math.floor(newPoint.y) * canvas.width;
                     const moistureLevel = moistureData[moistureIndex];
 
-                    if (moistureLevel > highestMoisture) {
-                        highestMoisture = moistureLevel;
-                        bestDirection = direction;
+                    if (!root.visited.has(pointKey) || enableBacktracking) {
+                        // Prefer unvisited points with higher moisture
+                        if (moistureLevel > highestMoisture) {
+                            highestMoisture = moistureLevel;
+                            bestDirection = direction;
+                        }
+                    } else if (!fallbackDirection || moistureLevel > highestMoisture) {
+                        // Save the revisitable direction with the highest moisture as a fallback
+                        fallbackDirection = direction;
                     }
                 }
             });
 
-            if (bestDirection) {
+            const chosenDirection = bestDirection || fallbackDirection;
+
+            if (chosenDirection) {
                 const newPoint = {
-                    x: root.path[root.path.length - 1].x + bestDirection.x,
-                    y: root.path[root.path.length - 1].y + bestDirection.y
+                    x: lastPoint.x + chosenDirection.x,
+                    y: lastPoint.y + chosenDirection.y
                 };
+
                 root.path.push(newPoint);
+                root.visited.add(pointToKey(newPoint));
 
                 // Consume the moisture at the new point
                 const moistureIndex = Math.floor(newPoint.x) + Math.floor(newPoint.y) * canvas.width;
@@ -206,12 +242,18 @@ function updateRoots() {
                             y: newPoint.y + splitDirection.y
                         };
 
-                        // Check if the split point is within the canvas boundaries
-                        if (splitPoint.x >= 0 && splitPoint.x < canvas.width && splitPoint.y >= 0 && splitPoint.y < canvas.height) {
+                        const splitKey = pointToKey(splitPoint);
+                        // Check if the split point is within the canvas boundaries and not revisited
+                        if (
+                            splitPoint.x >= 0 && splitPoint.x < canvas.width &&
+                            splitPoint.y >= 0 && splitPoint.y < canvas.height &&
+                            (!root.visited.has(splitKey) || enableBacktracking)
+                        ) {
                             newRoots.push({
                                 x: splitPoint.x,
                                 y: splitPoint.y,
                                 path: [splitPoint],
+                                visited: new Set([splitKey]),
                                 foundSoil: false,
                                 color: root.color // Inherit color from parent root
                             });
