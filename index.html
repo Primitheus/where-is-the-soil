@@ -47,6 +47,27 @@
       vertical-align: middle;
     }
 
+    .content {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      position: relative;
+    }
+
+    .controls {
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px;
+      background-color: #333;
+      border: 1px solid #444;
+      box-shadow: 0 0 10px #282727;
+      z-index: 1000; /* Ensure it stays on top */
+    }
+
     canvas {
       box-shadow: 0 0 10px #060606;
       border: 1px solid #333;
@@ -57,7 +78,26 @@
 <body>
   <div class='centerbox'>
     <h1 class="title">WHERE IS THE S<a href="inspiration.html"><img src="portal-0.png" alt="O"></a>IL</h1>
-    <canvas></canvas>
+    <div class="content">
+      <div class="controls">
+        <button id="toggleButton">Start</button>
+        <label for="frequency">Frequency:</label>
+        <input type="number" id="frequency" value="100">
+        <label for="amplitude">Amplitude:</label>
+        <input type="number" id="amplitude" value="2">
+        <label for="increment">Increment:</label>
+        <input type="number" id="increment" value="5">
+        <label for="numberOfRoots">Number of Roots:</label>
+        <input type="number" id="numberOfRoots" value="1">
+        <label for="splitCount">Number of Splits:</label>
+        <input type="number" id="splitCount" value="2">
+        <label for="canvasWidth">Canvas Width:</label>
+        <input type="number" id="canvasWidth" value="800">
+        <label for="canvasHeight">Canvas Height:</label>
+        <input type="number" id="canvasHeight" value="600">
+      </div>
+      <canvas></canvas>
+    </div>
     <h2>The Potato is a Lie.</h2>
   </div>
   <script src='perlin.js'></script>
